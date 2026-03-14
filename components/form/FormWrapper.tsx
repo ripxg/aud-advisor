@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { useFormStore } from "@/hooks/useFormStore";
 
 interface FormWrapperProps {
   step: number;
@@ -28,6 +29,7 @@ export function FormWrapper({
   description,
   children,
 }: FormWrapperProps) {
+  const { setStep } = useFormStore();
   const progress = (step / totalSteps) * 100;
 
   return (
@@ -35,19 +37,29 @@ export function FormWrapper({
       {/* Progress indicator */}
       <div className="mb-8">
         <div className="flex justify-between mb-2">
-          {stepLabels.map((label, index) => (
-            <span
-              key={label}
-              className={cn(
-                "text-xs font-medium transition-colors",
-                index + 1 <= step
-                  ? "text-emerald-500"
-                  : "text-slate-400"
-              )}
-            >
-              {label}
-            </span>
-          ))}
+          {stepLabels.map((label, index) => {
+            const targetStep = index + 1;
+            const isCompleted = targetStep < step;
+            const isCurrent = targetStep === step;
+            const isClickable = isCompleted;
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => isClickable && setStep(targetStep)}
+                disabled={!isClickable}
+                title={isClickable ? `Go to ${label}` : undefined}
+                className={cn(
+                  "text-xs font-medium transition-colors",
+                  isCurrent && "text-emerald-400 underline underline-offset-2",
+                  isCompleted && "text-emerald-500 cursor-pointer hover:text-emerald-300",
+                  !isCompleted && !isCurrent && "text-slate-500 cursor-default"
+                )}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
         <Progress value={progress} className="h-2" />
         <p className="text-sm text-slate-400 mt-2 text-center">

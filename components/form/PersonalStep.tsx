@@ -81,7 +81,7 @@ export function PersonalStep() {
           <div className="space-y-2">
             <Label htmlFor="state">State</Label>
             <Select
-              defaultValue={data.personal?.state || "NSW"}
+              value={watch("state") || "NSW"}
               onValueChange={(value) => setValue("state", value as typeof states[number])}
             >
               <SelectTrigger className="bg-slate-900/50 border-slate-600">
@@ -104,7 +104,7 @@ export function PersonalStep() {
         <div className="space-y-2">
           <Label htmlFor="residencyStatus">Residency Status</Label>
           <Select
-            defaultValue={data.personal?.residencyStatus || "australian_resident"}
+            value={watch("residencyStatus") || "australian_resident"}
             onValueChange={(value) => setValue("residencyStatus", value as PersonalData["residencyStatus"])}
           >
             <SelectTrigger className="bg-slate-900/50 border-slate-600">

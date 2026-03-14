@@ -24,10 +24,9 @@ export function SuperannuationStep() {
 
   const {
     register,
-
     handleSubmit,
-
     reset,
+    watch,
     setValue,
     formState: { errors },
   } = useForm<SuperannuationData>({
@@ -97,7 +96,7 @@ export function SuperannuationStep() {
         <div className="space-y-2">
           <Label htmlFor="riskProfile">Investment Risk Profile</Label>
           <Select
-            defaultValue={data.superannuation?.riskProfile || "balanced"}
+            value={watch("riskProfile") || "balanced"}
             onValueChange={(value) => setValue("riskProfile", value as SuperannuationData["riskProfile"])}
           >
             <SelectTrigger className="bg-slate-900/50 border-slate-600">
