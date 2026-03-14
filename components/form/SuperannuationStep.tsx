@@ -108,10 +108,10 @@ export function SuperannuationStep() {
             type="number"
             {...register("expectedRetirementAge")}
             className="bg-slate-900/50 border-slate-600"
-            min={60}
-            max={70}
+            min={18}
+            max={100}
           />
-          <p className="text-xs text-slate-500">Between 60 and 70 years old</p>
+          <p className="text-xs text-slate-500">Any age</p>
           {errors.expectedRetirementAge && (
             <p className="text-red-400 text-sm">{errors.expectedRetirementAge.message}</p>
           )}

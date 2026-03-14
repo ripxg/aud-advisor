@@ -41,7 +41,7 @@ export const superannuationSchema = z.object({
   currentSuperBalance: z.coerce.number().min(0),
   annualConcessionalContributions: z.coerce.number().min(0).max(30000),
   riskProfile: z.enum(["conservative", "balanced", "aggressive"]),
-  expectedRetirementAge: z.coerce.number().min(60).max(70),
+  expectedRetirementAge: z.coerce.number().min(18).max(100),
 });
 
 export const fullFormSchema = z.object({
