@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.ZHIPU_API_KEY,
-  baseURL: "https://open.bigmodel.cn/api/paas/v4",
-});
+// Lazy-load the OpenAI client to avoid build-time errors
+function getOpenAIClient() {
+  return new OpenAI({
+    apiKey: process.env.ZHIPU_API_KEY,
+    baseURL: "https://open.bigmodel.cn/api/paas/v4",
+  });
+}
 
 interface FinancialSummary {
   age: number;
@@ -29,6 +32,8 @@ interface FinancialSummary {
 export async function POST(request: Request) {
   try {
     const summary: FinancialSummary = await request.json();
+    
+    const openai = getOpenAIClient();
 
     const prompt = `You are an experienced Australian financial advisor providing general advice. Based on the following financial profile, provide helpful commentary on:
 
