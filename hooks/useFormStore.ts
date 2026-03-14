@@ -7,6 +7,8 @@ import type { FullFormData } from "@/lib/schemas";
 interface FormStore {
   currentStep: number;
   data: Partial<FullFormData>;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
   setStep: (step: number) => void;
   updateData: (section: keyof FullFormData, data: Record<string, unknown>) => void;
   resetForm: () => void;
@@ -27,7 +29,9 @@ export const useFormStore = create<FormStore>()(
     (set, get) => ({
       currentStep: 1,
       data: initialData,
-      
+      _hasHydrated: false,
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
+
       setStep: (step) => set({ currentStep: step }),
       
       updateData: (section, sectionData) => 
@@ -54,6 +58,9 @@ export const useFormStore = create<FormStore>()(
     }),
     {
       name: "aud-advisor-form",
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

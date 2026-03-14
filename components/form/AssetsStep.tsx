@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { assetsSchema, type AssetsData } from "@/lib/schemas";
@@ -10,11 +11,14 @@ import { Label } from "@/components/ui/label";
 import { FormWrapper } from "./FormWrapper";
 
 export function AssetsStep() {
-  const { data, updateData, setStep } = useFormStore();
+  const { data, updateData, setStep, _hasHydrated } = useFormStore();
 
   const {
     register,
+
     handleSubmit,
+
+    reset,
     formState: { errors },
   } = useForm<AssetsData>({
     resolver: zodResolver(assetsSchema),
@@ -26,6 +30,12 @@ export function AssetsStep() {
       cashSavings: 0,
     },
   });
+
+  useEffect(() => {
+    if (_hasHydrated && data.assets) {
+      reset(data.assets);
+    }
+  }, [_hasHydrated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit = (formData: AssetsData) => {
     updateData("assets", formData);

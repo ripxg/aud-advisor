@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,11 +20,14 @@ import { FormWrapper } from "./FormWrapper";
 
 export function SuperannuationStep() {
   const router = useRouter();
-  const { data, updateData, setStep } = useFormStore();
+  const { data, updateData, setStep, _hasHydrated } = useFormStore();
 
   const {
     register,
+
     handleSubmit,
+
+    reset,
     setValue,
     formState: { errors },
   } = useForm<SuperannuationData>({
@@ -35,6 +39,12 @@ export function SuperannuationStep() {
       expectedRetirementAge: 65,
     },
   });
+
+  useEffect(() => {
+    if (_hasHydrated && data.superannuation) {
+      reset(data.superannuation);
+    }
+  }, [_hasHydrated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit = (formData: SuperannuationData) => {
     updateData("superannuation", formData);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { liabilitiesSchema, type LiabilitiesData } from "@/lib/schemas";
@@ -10,11 +11,14 @@ import { Label } from "@/components/ui/label";
 import { FormWrapper } from "./FormWrapper";
 
 export function LiabilitiesStep() {
-  const { data, updateData, setStep } = useFormStore();
+  const { data, updateData, setStep, _hasHydrated } = useFormStore();
 
   const {
     register,
+
     handleSubmit,
+
+    reset,
     formState: { errors },
   } = useForm<LiabilitiesData>({
     resolver: zodResolver(liabilitiesSchema),
@@ -25,6 +29,12 @@ export function LiabilitiesStep() {
       creditCardDebt: 0,
     },
   });
+
+  useEffect(() => {
+    if (_hasHydrated && data.liabilities) {
+      reset(data.liabilities);
+    }
+  }, [_hasHydrated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit = (formData: LiabilitiesData) => {
     updateData("liabilities", formData);

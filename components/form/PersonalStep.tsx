@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { personalSchema, type PersonalData } from "@/lib/schemas";
@@ -19,11 +20,14 @@ import { FormWrapper } from "./FormWrapper";
 const states = ["ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"] as const;
 
 export function PersonalStep() {
-  const { data, updateData, setStep } = useFormStore();
+  const { data, updateData, setStep, _hasHydrated } = useFormStore();
   
   const {
     register,
+
     handleSubmit,
+
+    reset,
     watch,
     setValue,
     formState: { errors },
@@ -40,6 +44,12 @@ export function PersonalStep() {
   });
 
   const hasHecsDebt = watch("hasHecsDebt");
+
+  useEffect(() => {
+    if (_hasHydrated && data.personal) {
+      reset(data.personal);
+    }
+  }, [_hasHydrated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit = (formData: PersonalData) => {
     updateData("personal", formData);

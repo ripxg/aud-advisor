@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { expensesSchema, type ExpensesData } from "@/lib/schemas";
@@ -10,11 +11,14 @@ import { Label } from "@/components/ui/label";
 import { FormWrapper } from "./FormWrapper";
 
 export function ExpensesStep() {
-  const { data, updateData, setStep } = useFormStore();
+  const { data, updateData, setStep, _hasHydrated } = useFormStore();
 
   const {
     register,
+
     handleSubmit,
+
+    reset,
     formState: { errors },
   } = useForm<ExpensesData>({
     resolver: zodResolver(expensesSchema),
@@ -24,6 +28,12 @@ export function ExpensesStep() {
       annualInsurancePremiums: 0,
     },
   });
+
+  useEffect(() => {
+    if (_hasHydrated && data.expenses) {
+      reset(data.expenses);
+    }
+  }, [_hasHydrated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit = (formData: ExpensesData) => {
     updateData("expenses", formData);

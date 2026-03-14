@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { incomeSchema, type IncomeData } from "@/lib/schemas";
@@ -10,11 +11,14 @@ import { Label } from "@/components/ui/label";
 import { FormWrapper } from "./FormWrapper";
 
 export function IncomeStep() {
-  const { data, updateData, setStep } = useFormStore();
+  const { data, updateData, setStep, _hasHydrated } = useFormStore();
 
   const {
     register,
+
     handleSubmit,
+
+    reset,
     formState: { errors },
   } = useForm<IncomeData>({
     resolver: zodResolver(incomeSchema),
@@ -25,6 +29,12 @@ export function IncomeStep() {
       foreignIncome: 0,
     },
   });
+
+  useEffect(() => {
+    if (_hasHydrated && data.income) {
+      reset(data.income);
+    }
+  }, [_hasHydrated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit = (formData: IncomeData) => {
     updateData("income", formData);
