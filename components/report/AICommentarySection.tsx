@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import type { FullFormData } from "@/lib/schemas";
 import type { TaxBreakdown } from "@/lib/tax-calculator";
 import type { NetWorthBreakdown, CashFlowBreakdown, SuperProjection } from "@/lib/projections";
@@ -23,6 +24,8 @@ export function AICommentarySection({
   superProjection,
 }: AICommentarySectionProps) {
   const [commentary, setCommentary] = useState<string | null>(null);
+  const [model, setModel] = useState<string | null>(null);
+  const [isFallback, setIsFallback] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,6 +60,8 @@ export function AICommentarySection({
 
         const data = await response.json();
         setCommentary(data.commentary);
+        setModel(data.model || "unknown");
+        setIsFallback(data.fallback || false);
       } catch (err) {
         setError("Unable to generate AI commentary at this time.");
         console.error(err);
@@ -72,7 +77,7 @@ export function AICommentarySection({
     // Split into sections and format
     const lines = text.split("\n");
     return lines.map((line, index) => {
-      // Headers (numbered sections or bold markers)
+      // Headers (numbered sections or bold markers or ## headers)
       if (line.match(/^#+\s/) || line.match(/^\d+\.\s+[A-Z]/) || line.match(/^\*\*[^*]+\*\*/)) {
         const cleanLine = line.replace(/^#+\s*/, "").replace(/\*\*/g, "");
         return (
@@ -89,11 +94,19 @@ export function AICommentarySection({
           </li>
         );
       }
+      // Horizontal rules / dividers
+      if (line.match(/^---+$/)) {
+        return <hr key={index} className="border-slate-700 my-4" />;
+      }
       // Regular paragraphs
       if (line.trim()) {
+        // Handle bold text within paragraphs
+        const formattedLine = line.split(/\*\*([^*]+)\*\*/).map((part, i) => 
+          i % 2 === 1 ? <strong key={i} className="text-white">{part}</strong> : part
+        );
         return (
           <p key={index} className="text-slate-300 mb-3">
-            {line}
+            {formattedLine}
           </p>
         );
       }
@@ -101,14 +114,34 @@ export function AICommentarySection({
     });
   };
 
+  const getModelBadge = () => {
+    if (!model) return null;
+    
+    if (isFallback) {
+      return (
+        <Badge className="bg-amber-600/20 text-amber-400 border-amber-500/30 text-xs ml-2">
+          Rule-Based Analysis
+        </Badge>
+      );
+    }
+    
+    const modelDisplay = model === "glm-4-air" ? "GLM-4 Air" 
+      : model === "glm-4-plus" ? "GLM-4 Plus"
+      : model;
+    
+    return (
+      <Badge className="bg-emerald-600/20 text-emerald-400 border-emerald-500/30 text-xs ml-2">
+        Powered by {modelDisplay}
+      </Badge>
+    );
+  };
+
   return (
     <Card className="bg-slate-800/50 border-slate-700">
       <CardHeader>
-        <CardTitle className="text-xl text-white flex items-center gap-2">
+        <CardTitle className="text-xl text-white flex items-center gap-2 flex-wrap">
           <span className="text-2xl">🤖</span> AI Advisory Commentary
-          <span className="text-xs bg-emerald-600/20 text-emerald-400 px-2 py-1 rounded-full ml-2">
-            Powered by GLM-5
-          </span>
+          {!loading && getModelBadge()}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -128,6 +161,13 @@ export function AICommentarySection({
           </div>
         ) : (
           <div className="prose prose-invert max-w-none">
+            {isFallback && (
+              <div className="bg-amber-900/10 border border-amber-700/30 rounded-lg p-3 mb-4">
+                <p className="text-amber-400 text-sm">
+                  📊 This analysis was generated using our rule-based engine based on Australian financial best practices.
+                </p>
+              </div>
+            )}
             {formatCommentary(commentary || "")}
           </div>
         )}

@@ -7,9 +7,11 @@ import { useFormStore } from "@/hooks/useFormStore";
 import { calculateTaxBreakdown } from "@/lib/tax-calculator";
 import { calculateNetWorth, calculateCashFlow, projectWealthDetailed, projectSuperannuation } from "@/lib/projections";
 import { TaxBreakdownSection } from "@/components/report/TaxBreakdownSection";
+import { TaxImplicationsSection } from "@/components/report/TaxImplicationsSection";
 import { NetWorthSection } from "@/components/report/NetWorthSection";
 import { ProjectionsSection } from "@/components/report/ProjectionsSection";
 import { SuperSection } from "@/components/report/SuperSection";
+import { InvestmentOptionsSection } from "@/components/report/InvestmentOptionsSection";
 import { AICommentarySection } from "@/components/report/AICommentarySection";
 import { DisclaimerSection } from "@/components/report/DisclaimerSection";
 import { Button } from "@/components/ui/button";
@@ -85,19 +87,33 @@ export default function ReportPage() {
           {/* Section A: Tax Breakdown */}
           <TaxBreakdownSection data={taxBreakdown} />
 
-          {/* Section B: Net Worth & Cash Flow */}
+          {/* Section B: Tax Implications (NEW) */}
+          <TaxImplicationsSection
+            formData={formData}
+            taxBreakdown={taxBreakdown}
+            netWorth={netWorth}
+          />
+
+          {/* Section C: Net Worth & Cash Flow */}
           <NetWorthSection netWorth={netWorth} cashFlow={cashFlow} />
 
-          {/* Section C: Investment Projections */}
+          {/* Section D: Investment Projections */}
           <ProjectionsSection projections={wealthProjections} />
 
-          {/* Section D: Superannuation Outlook */}
+          {/* Section E: Superannuation Outlook */}
           <SuperSection
             projection={superProjection}
             riskProfile={formData.superannuation.riskProfile}
           />
 
-          {/* Section E: AI Commentary */}
+          {/* Section F: Investment Options (NEW) */}
+          <InvestmentOptionsSection
+            formData={formData}
+            netWorth={netWorth}
+            cashFlow={cashFlow}
+          />
+
+          {/* Section G: AI Commentary */}
           <AICommentarySection
             formData={formData}
             taxBreakdown={taxBreakdown}
@@ -106,7 +122,7 @@ export default function ReportPage() {
             superProjection={superProjection}
           />
 
-          {/* Section F: Disclaimer */}
+          {/* Section H: Disclaimer */}
           <DisclaimerSection />
         </div>
 
